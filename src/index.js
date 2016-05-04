@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReactDom from 'react-dom';
 import $ from 'jquery';
 import Profile from './components/Profile';
+import Search from './components/Search';
 
 
 class App extends Component {
@@ -14,6 +15,7 @@ class App extends Component {
 			perPage: 5
 		}
 		this.getUserData();
+		this.getUserRepos();
 	}
 
 	getUserData() {
@@ -23,7 +25,21 @@ class App extends Component {
 			cache: false,
 			success: (data) => {
 				this.setState({userData: data});
-				console.log(data);
+			},
+			error: (xhr, status, err) => {
+				this.setState({username: null});
+				alert(err);
+			}
+		});
+	}
+
+	getUserRepos() {
+		$.ajax({
+			url: `https://api.github.com/users/${this.state.username}/repos?per_page=${this.state.perPage}&client_id=${this.props.clientId}&client_secret=${this.props.clientSecret}&sort=created`,
+			dataType: 'json',
+			cache: false,
+			success: (data) => {
+				this.setState({userRepos: data});
 			},
 			error: (xhr, status, err) => {
 				this.setState({username: null});
@@ -35,7 +51,14 @@ class App extends Component {
 	render() {
 		return(
 			<div>
-				<Profile userData = { this.state.userData }/>
+				<Search onFormSubmit = {(username) => this.setState(
+					{username: username},
+					() => {
+						this.getUserData();
+						this.getUserRepos();
+					}
+				)}/>
+				<Profile {...this.state} />
 			</div>
 		);
 	}
