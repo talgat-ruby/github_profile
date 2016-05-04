@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactDom from 'react-dom';
 import $ from 'jquery';
+import Profile from './components/Profile';
 
 
 class App extends Component {
@@ -21,9 +22,11 @@ class App extends Component {
 			dataType: 'json',
 			cache: false,
 			success: (data) => {
+				this.setState({userData: data});
 				console.log(data);
 			},
 			error: (xhr, status, err) => {
+				this.setState({username: null});
 				alert(err);
 			}
 		});
@@ -31,7 +34,9 @@ class App extends Component {
 
 	render() {
 		return(
-			<div>{this.props.clientId}</div>
+			<div>
+				<Profile userData = { this.state.userData }/>
+			</div>
 		);
 	}
 }
